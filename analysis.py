@@ -27,8 +27,13 @@ with st.sidebar:
 t1, t2, t3 = st.tabs(["Overview", "Data", "Conclusion"])
 with t1:
     st.write("The overview of our library analysis")
+    st.write("This i san overview of our library analysis. " \
+    "We are going to see the data of multiple libraries over the US along with" \
+    "their digital materials, program attendance, population, etc.")
+    st.write("Here is our dataframe with our columns.")
+    st.dataframe(df)
 with t2:
-    st.write("The data analysis")
+    st.write("The data analysis:")
     st.dataframe(df)
 
     lib_df = state_df[state_df["LIBNAME"] == library]
@@ -59,5 +64,18 @@ with t2:
         title=f"Staff Expenditures in {library} in {state}",
     )
     st.plotly_chart(fig, use_container_width=True)
-    with t3:
-        st.write("Conclusion")
+
+    kids_attendance = lib_df[["K0_5ATTEN","K6_11ATTEN","YAATTEN"]].sum().reset_index()
+    kids_attendance.columns = ["kids_group", "attendance"]
+    st.write(f"### Kids Attendance in {library}")
+    #st.write("Material types in library")
+    fig = px.bar(
+        kids_attendance,
+        x="kids_group",
+        y="attendance",
+        title=f"Kids attendance {library}"
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+with t3:
+    st.write("Conclusion")
