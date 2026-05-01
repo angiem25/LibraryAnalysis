@@ -35,13 +35,22 @@ y="BKVOL", color="BRANLIB")
 st.plotly_chart(fig, use_container_width=True)
 
 materials = lib_df[["PRMATEXP", "ELMATEXP"]].sum().reset_index()
-materials.columns = ["Material Type", "Expenditure"]
+materials.columns = ["Material Type", "Amount"]
 st.write(f"### Materials in {library}")
 st.write("Material types in library")
 fig = px.bar(
     materials,
     x="Material Type",
-    y="Expenditure",
+    y="Amount",
     title=f"Material Expenditures in {library}"
+)
+st.plotly_chart(fig, use_container_width=True)
+
+st.write("Staff and Expenditures")
+fig = px.box(
+    state_df,
+    x="STABR",
+    y="STAFFEXP",
+    title=f"Staff Expenditures in {library} in {state}",
 )
 st.plotly_chart(fig, use_container_width=True)
