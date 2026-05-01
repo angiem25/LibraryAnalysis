@@ -24,33 +24,40 @@ with st.sidebar:
         sorted(state_df["LIBNAME"].dropna().unique())
     )
 
-# ✅ Filter data
+t1, t2, t3 = st.tabs(["Overview", "Data", "Conclusion"])
+with t1:
+    st.write("The overview of our library analysis")
+with t2:
+    st.write("The data analysis")
+    st.dataframe(df)
 
-lib_df = state_df[state_df["LIBNAME"] == library]
+    lib_df = state_df[state_df["LIBNAME"] == library]
 
-st.write(f"### Population vs Book Volume in {state}")
-st.write("Population vs Book Volume vs Library Branches in a City")
-fig = px.scatter(state_df, x="POPU_LSA",
-y="BKVOL", color="BRANLIB")
-st.plotly_chart(fig, use_container_width=True)
+    st.write(f"### Population vs Book Volume in {state}")
+    st.write("Population vs Book Volume vs Library Branches in a City")
+    fig = px.scatter(state_df, x="POPU_LSA",
+    y="BKVOL", color="BRANLIB")
+    st.plotly_chart(fig, use_container_width=True)
 
-materials = lib_df[["PRMATEXP", "ELMATEXP"]].sum().reset_index()
-materials.columns = ["Material Type", "Amount"]
-st.write(f"### Materials in {library}")
-st.write("Material types in library")
-fig = px.bar(
-    materials,
-    x="Material Type",
-    y="Amount",
-    title=f"Material Expenditures in {library}"
-)
-st.plotly_chart(fig, use_container_width=True)
+    materials = lib_df[["PRMATEXP", "ELMATEXP"]].sum().reset_index()
+    materials.columns = ["Material Type", "Amount"]
+    st.write(f"### Materials in {library}")
+    st.write("Material types in library")
+    fig = px.bar(
+        materials,
+        x="Material Type",
+        y="Amount",
+        title=f"Material Expenditures in {library}"
+    )
+    st.plotly_chart(fig, use_container_width=True)
 
-st.write("Staff and Expenditures")
-fig = px.box(
-    state_df,
-    x="STABR",
-    y="STAFFEXP",
-    title=f"Staff Expenditures in {library} in {state}",
-)
-st.plotly_chart(fig, use_container_width=True)
+    st.write("Staff and Expenditures")
+    fig = px.box(
+        state_df,
+        x="STABR",
+        y="STAFFEXP",
+        title=f"Staff Expenditures in {library} in {state}",
+    )
+    st.plotly_chart(fig, use_container_width=True)
+    with t3:
+        st.write("Conclusion")
