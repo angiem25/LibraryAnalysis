@@ -79,6 +79,10 @@ with st.sidebar:
         "VISITS"
     ]
 )
+    
+    state_df["VISITS_PER_PERSON"] = (
+    state_df["VISITS"] / state_df["POPU_LSA"]
+    )
 
     top5_df = (
     df.sort_values(by=top5_metric, ascending=False)
@@ -100,10 +104,10 @@ with st.sidebar:
     value_name="Value"
     )
 
-t1, t2, t3 = st.tabs(["Overview", "Data", "Conclusion"])
+t1, t2, t3, t4 = st.tabs(["Overview", "Data", "Data Trends", "Conclusion"])
 with t1:
     st.write("The overview of our library analysis")
-    st.write("This i san overview of our library analysis. " \
+    st.write("This is an overview of our library analysis. " \
     "We are going to see the data of multiple libraries over the US along with" \
     "their digital materials, program attendance, population, etc.")
     st.write("Here is our dataframe with our columns.")
@@ -180,110 +184,129 @@ with t2:
 
     program_df = top5_state[[ "LIBNAME", "TOTPRO", "ADULTPRO" ]].dropna()
 
-program_long = program_df.melt(
-    id_vars="LIBNAME",
-    value_vars=["TOTPRO", "ADULTPRO"],
-    var_name="Program Type",
-    value_name="Count"
-)
-
-fig = px.bar(
-    program_long,
-    x="LIBNAME",
-    y="Count",
-    color="Program Type",
-    barmode="stack",
-    title="Library Programs Breakdown"
-)
-
-st.plotly_chart(fig, use_container_width=True)
-
-attendance_df = top5_state[[ "LIBNAME", "TOTATTEN", "ADULTATTEN" ]].dropna()
-
-attendance_long = attendance_df.melt(
-    id_vars="LIBNAME",
-    value_vars=["TOTATTEN", "ADULTATTEN"],
-    var_name="Attendance Type",
-    value_name="Value"
-)
-
-fig = px.bar(
-    attendance_long,
-    x="LIBNAME",
-    y="Value",
-    color="Attendance Type",
-    barmode="group",
-    title="Library Attendance Comparison"
-)
-
-st.plotly_chart(fig, use_container_width=True)
-
-
-fig = px.bar(
-    top5_state.sort_values(by=top5_metric),
-    x=top5_metric,
-    y="LIBNAME",
-    orientation="h",
-    title=f"Top 5 Libraries in {state}"
-)
-
-st.plotly_chart(fig, use_container_width=True)
-
-st.subheader("📍 Visits vs Program Attendance")
-
-fig = px.scatter(
-    top5_state,
-    x="VISITS",
-    y="TOTATTEN",
-    size="TOTPRO",
-    color="LIBNAME",
-    hover_name="LIBNAME",
-    title=f"Visits vs Attendance in {state}",
-    trendline="ols"
-)
-
-st.plotly_chart(fig, use_container_width=True)
-
-st.subheader("📚 Circulation vs Electronic Materials")
-
-fig = px.scatter(
-    top5_state,
-    x="TOTCIR",
-    y="ELMATCIR",
-    size="VISITS",
-    color="LIBNAME",
-    hover_name="LIBNAME",
-    title=f"Circulation vs Electronic Materials in {state}",
-)
-
-st.plotly_chart(fig, use_container_width=True)
-
-fig = px.scatter(
-    top5_state,
-    x="TOTPRO",
-    y="TOTATTEN",
-    size="TOTCIR",
-    color="ELMATCIR",
-    hover_name="LIBNAME",
-    title=f"Library Engagement Analysis in {state}",
-    color_discrete_sequence=px.colors.qualitative.Bold
-)
-
-
-st.plotly_chart(fig, use_container_width=True)
-
-state_df["VISITS_PER_PERSON"] = (
-    state_df["VISITS"] / state_df["POPU_LSA"]
-)
-
-fig = px.bar(
-    top5_state.sort_values(by="VISITS_PER_PERSON"),
-    x="VISITS_PER_PERSON",
-    y="LIBNAME",
-    orientation="h",
-    title="Library Visit Efficiency"
-)
-
-
 with t3:
-    st.write("Conclusion")
+
+    program_long = program_df.melt(
+        id_vars="LIBNAME",
+        value_vars=["TOTPRO", "ADULTPRO"],
+        var_name="Program Type",
+        value_name="Count"
+    )
+
+    fig = px.bar(
+        program_long,
+        x="LIBNAME",
+        y="Count",
+        color="Program Type",
+        barmode="stack",
+        title="Library Programs Breakdown"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    attendance_df = top5_state[[ "LIBNAME", "TOTATTEN", "ADULTATTEN" ]].dropna()
+
+    attendance_long = attendance_df.melt(
+        id_vars="LIBNAME",
+        value_vars=["TOTATTEN", "ADULTATTEN"],
+        var_name="Attendance Type",
+        value_name="Value"
+    )
+
+    fig = px.bar(
+        attendance_long,
+        x="LIBNAME",
+        y="Value",
+        color="Attendance Type",
+        barmode="group",
+        title="Library Attendance Comparison"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+
+    fig = px.bar(
+        top5_state.sort_values(by=top5_metric),
+        x=top5_metric,
+        y="LIBNAME",
+        orientation="h",
+        title=f"Top 5 Libraries in {state}"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.subheader("📍 Visits vs Program Attendance")
+
+    fig = px.scatter(
+        top5_state,
+        x="VISITS",
+        y="TOTATTEN",
+        size="TOTPRO",
+        color="LIBNAME",
+        hover_name="LIBNAME",
+        title=f"Visits vs Attendance in {state}",
+        trendline="ols"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.subheader("📚 Circulation vs Electronic Materials")
+
+    fig = px.scatter(
+        top5_state,
+        x="TOTCIR",
+        y="ELMATCIR",
+        size="VISITS",
+        color="LIBNAME",
+        hover_name="LIBNAME",
+        title=f"Circulation vs Electronic Materials in {state}",
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    fig = px.scatter(
+        top5_state,
+        x="TOTPRO",
+        y="TOTATTEN",
+        size="TOTCIR",
+        color="ELMATCIR",
+        hover_name="LIBNAME",
+        title=f"Library Engagement Analysis in {state}",
+        color_discrete_sequence=px.colors.qualitative.Bold
+    )
+
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.subheader("👥 Population vs Library Visits")
+
+    fig = px.scatter(
+        top5_state,
+        x="POPU_LSA",
+        y="VISITS",
+        size="TOTCIR",
+        color="LIBNAME",
+        hover_name="LIBNAME",
+        title=f"Population vs Visits in {state}",
+        color_discrete_sequence=px.colors.qualitative.Bold
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    fig = px.bar(
+        top5_state.sort_values(by="VISITS_PER_PERSON"),
+        x="VISITS_PER_PERSON",
+        y="LIBNAME",
+        orientation="h",
+        title="Library Visit Efficiency"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+with t4:
+    st.write("Conclusion: ")
+    st.write("We can see that the higher a population, the more visits there is to libraries. " \
+    "There is a strong correlations between attendance and visits. There is also a strong correlation " \
+    "between circulation and electronic materials. While there are many adult programs, we can see they do not " \
+    "make up the majority of program attendance. " \
+    "It can be fair to make a hypothesis that adults make a majority of electronic circulation because of this. ")
