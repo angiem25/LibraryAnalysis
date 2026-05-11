@@ -254,10 +254,35 @@ fig = px.scatter(
     color="LIBNAME",
     hover_name="LIBNAME",
     title=f"Circulation vs Electronic Materials in {state}",
-    trendline="ols"
 )
 
 st.plotly_chart(fig, use_container_width=True)
+
+fig = px.scatter(
+    top5_state,
+    x="TOTPRO",
+    y="TOTATTEN",
+    size="TOTCIR",
+    color="ELMATCIR",
+    hover_name="LIBNAME",
+    title=f"Library Engagement Analysis in {state}",
+    color_discrete_sequence=px.colors.qualitative.Bold
+)
+
+
+st.plotly_chart(fig, use_container_width=True)
+
+state_df["VISITS_PER_PERSON"] = (
+    state_df["VISITS"] / state_df["POPU_LSA"]
+)
+
+fig = px.bar(
+    top5_state.sort_values(by="VISITS_PER_PERSON"),
+    x="VISITS_PER_PERSON",
+    y="LIBNAME",
+    orientation="h",
+    title="Library Visit Efficiency"
+)
 
 
 with t3:
