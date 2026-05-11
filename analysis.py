@@ -14,6 +14,11 @@ numeric_cols = [
     "F_EBOOK",
     "ELECCOLL",
     "TOTCIR",
+    "ELMATCIR",
+    "TOTPRO",
+    "ADULTPRO",
+    "TOTATTEN",
+    "ADULTATTEN",
     "BKVOL",
     "VISITS",
     "POPU_LSA",
@@ -58,16 +63,22 @@ with st.sidebar:
         sorted(state_df["LIBNAME"].dropna().unique())
     )
 
+
     top5_metric = st.selectbox(
-        "Top 5 Visualization",
-        [
-            "F_EBOOK",
-            "ELECCOLL",
-            "TOTCIR",
-            "BKVOL",
-            "VISITS"
-        ]
-    )
+    "Top 5 Visualization",
+    [
+        "TOTCIR",
+        "ELMATCIR",
+        "TOTPRO",
+        "ADULTPRO",
+        "TOTATTEN",
+        "ADULTATTEN",
+        "F_EBOOK",
+        "ELECCOLL",
+        "BKVOL",
+        "VISITS"
+    ]
+)
 
     top5_df = (
     df.sort_values(by=top5_metric, ascending=False)
@@ -81,6 +92,13 @@ with st.sidebar:
         .reset_index(drop=True)
     )
 
+    circulation_df = top5_state[[ "LIBNAME", "TOTCIR", "ELMATCIR" ]].dropna()
+    circulation_long = circulation_df.melt(
+    id_vars="LIBNAME",
+    value_vars=["TOTCIR", "ELMATCIR"],
+    var_name="Type",
+    value_name="Value"
+    )
 
 t1, t2, t3 = st.tabs(["Overview", "Data", "Conclusion"])
 with t1:
@@ -148,6 +166,98 @@ with t2:
             height=400
         )
         st.plotly_chart(fig, use_container_width=True)
+
+    fig = px.bar(
+        circulation_long,
+        x="LIBNAME",
+        y="Value",
+        color="Type",
+        barmode="group",
+        title="Circulation: Physical vs Electronic"
+        )
+
+    st.plotly_chart(fig, use_container_width=True)    
+
+    program_df = top5_state[[ "LIBNAME", "TOTPRO", "ADULTPRO" ]].dropna()
+
+program_long = program_df.melt(
+    id_vars="LIBNAME",
+    value_vars=["TOTPRO", "ADULTPRO"],
+    var_name="Program Type",
+    value_name="Count"
+)
+
+fig = px.bar(
+    program_long,
+    x="LIBNAME",
+    y="Count",
+    color="Program Type",
+    barmode="stack",
+    title="Library Programs Breakdown"
+)
+
+st.plotly_chart(fig, use_container_width=True)
+
+attendance_df = top5_state[[ "LIBNAME", "TOTATTEN", "ADULTATTEN" ]].dropna()
+
+attendance_long = attendance_df.melt(
+    id_vars="LIBNAME",
+    value_vars=["TOTATTEN", "ADULTATTEN"],
+    var_name="Attendance Type",
+    value_name="Value"
+)
+
+fig = px.bar(
+    attendance_long,
+    x="LIBNAME",
+    y="Value",
+    color="Attendance Type",
+    barmode="group",
+    title="Library Attendance Comparison"
+)
+
+st.plotly_chart(fig, use_container_width=True)
+
+
+fig = px.bar(
+    top5_state.sort_values(by=top5_metric),
+    x=top5_metric,
+    y="LIBNAME",
+    orientation="h",
+    title=f"Top 5 Libraries in {state}"
+)
+
+st.plotly_chart(fig, use_container_width=True)
+
+st.subheader("📍 Visits vs Program Attendance")
+
+fig = px.scatter(
+    top5_state,
+    x="VISITS",
+    y="TOTATTEN",
+    size="TOTPRO",
+    color="LIBNAME",
+    hover_name="LIBNAME",
+    title=f"Visits vs Attendance in {state}",
+    trendline="ols"
+)
+
+st.plotly_chart(fig, use_container_width=True)
+
+st.subheader("📚 Circulation vs Electronic Materials")
+
+fig = px.scatter(
+    top5_state,
+    x="TOTCIR",
+    y="ELMATCIR",
+    size="VISITS",
+    color="LIBNAME",
+    hover_name="LIBNAME",
+    title=f"Circulation vs Electronic Materials in {state}",
+    trendline="ols"
+)
+
+st.plotly_chart(fig, use_container_width=True)
 
 
 with t3:
